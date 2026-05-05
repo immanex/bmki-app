@@ -11,6 +11,8 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        "bmki-purple": "#4A148C",
+        "bmki-gold": "#FFD700",
       },
     },
   },
