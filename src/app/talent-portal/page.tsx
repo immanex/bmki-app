@@ -8,16 +8,37 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { auth, db } from "@/lib/firebase";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 
-const authSchema = z.object({
+const getFirebaseErrorMessage = (code: string): string => {
+  const messages: Record<string, string> = {
+    'auth/email-already-in-use': 'This email is already registered. Try signing in instead.',
+    'auth/user-not-found': 'No account found with this email address.',
+    'auth/wrong-password': 'Incorrect password. Please try again.',
+    'auth/invalid-credential': 'Invalid email or password.',
+    'auth/too-many-requests': 'Too many failed attempts. Please wait a few minutes.',
+    'auth/invalid-email': 'Please enter a valid email address.',
+    'auth/weak-password': 'Password must be at least 6 characters.',
+    'auth/network-request-failed': 'Network error. Check your connection and try again.',
+  };
+  return messages[code] ?? 'Something went wrong. Please try again.';
+};
+
+const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
-  fullName: z.string().optional(),
-  talentType: z.string().optional(),
 });
 
-type AuthFormValues = z.infer<typeof authSchema>;
+const registerSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  fullName: z.string().min(2, "Full name is required"),
+  talentType: z.string().min(1, "Please select your talent type"),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
+type RegisterFormValues = z.infer<typeof registerSchema>;
+type AuthFormValues = LoginFormValues & Partial<RegisterFormValues>;
 
 export default function TalentPortal() {
   const [isLogin, setIsLogin] = useState(true);
@@ -32,7 +53,7 @@ export default function TalentPortal() {
     formState: { errors },
     reset,
   } = useForm<AuthFormValues>({
-    resolver: zodResolver(authSchema),
+    resolver: zodResolver(isLogin ? loginSchema : registerSchema),
   });
 
   const onSubmit = async (data: AuthFormValues) => {
@@ -53,18 +74,27 @@ export default function TalentPortal() {
         
         // Save additional user info to Firestore
         await setDoc(doc(db, "talents", user.uid), {
+          uid: user.uid,
           email: data.email,
-          fullName: data.fullName,
-          talentType: data.talentType,
-          createdAt: new Date(),
+          fullName: data.fullName ?? "",
+          talentType: data.talentType ?? "",
+          bio: "",
+          profilePhotoURL: "",
+          skills: [],
+          socialLinks: {},
+          experienceLevel: "beginner",
+          profileComplete: 10,
+          isVerified: false,
+          badges: [],
+          createdAt: serverTimestamp(),
         });
         
         setSuccess("Account created successfully! Redirecting...");
-        setTimeout(() => router.push("/talent-portal/dashboard"), 1500);
+        setTimeout(() => router.push("/talent-portal/onboarding"), 1500);
       }
       reset();
     } catch (err: any) {
-      setError(err.message || "An error occurred during authentication.");
+      setError(getFirebaseErrorMessage(err.code));
     } finally {
       setIsLoading(false);
     }
@@ -113,6 +143,9 @@ export default function TalentPortal() {
                       type="text"
                       className="appearance-none block w-full px-3 py-2 border border-gray-300 dark:border-neutral-700 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-bmki-purple focus:border-bmki-purple sm:text-sm dark:bg-neutral-800 dark:text-white"
                     />
+                    {errors.fullName && (
+                      <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.fullName.message}</p>
+                    )}
                   </div>
                 </div>
 
@@ -132,6 +165,9 @@ export default function TalentPortal() {
                       <option value="comedy">Comedy</option>
                       <option value="other">Other</option>
                     </select>
+                    {errors.talentType && (
+                      <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.talentType.message}</p>
+                    )}
                   </div>
                 </div>
               </>

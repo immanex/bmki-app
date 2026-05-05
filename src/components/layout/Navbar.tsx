@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { usePathname } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 const navLinks = [
   { name: "Home", href: "/" },
@@ -18,12 +20,14 @@ const navLinks = [
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
+  const { user } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -48,7 +52,9 @@ export default function Navbar() {
               <Link
                 key={link.name}
                 href={link.href}
-                className="text-white hover:text-bmki-gold transition-colors font-medium"
+                className={`text-white hover:text-bmki-gold transition-colors font-medium ${
+                  pathname === link.href ? "text-bmki-gold border-b-2 border-bmki-gold pb-1" : ""
+                }`}
               >
                 {link.name}
               </Link>
@@ -56,18 +62,22 @@ export default function Navbar() {
           </nav>
 
           <div className="hidden md:flex">
-            <Link
-              href="/talent-portal"
-              className="bg-bmki-gold text-bmki-purple px-6 py-2 rounded-full font-bold hover:bg-white transition-colors shadow-lg hover:shadow-bmki-gold/50"
-            >
-              Talent Portal
-            </Link>
+            {user ? (
+              <Link href="/talent-portal/dashboard" className="bg-bmki-gold text-bmki-purple px-6 py-2 rounded-full font-bold hover:bg-white transition-colors shadow-lg">
+                My Portal
+              </Link>
+            ) : (
+              <Link href="/talent-portal" className="bg-bmki-gold text-bmki-purple px-6 py-2 rounded-full font-bold hover:bg-white transition-colors shadow-lg hover:shadow-bmki-gold/50">
+                Talent Portal
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsOpen(!isOpen)}
+              aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
               className="text-white hover:text-bmki-gold focus:outline-none"
             >
               {isOpen ? <X size={28} /> : <Menu size={28} />}
@@ -77,34 +87,50 @@ export default function Navbar() {
       </div>
 
       {/* Mobile Nav */}
-      {isOpen && (
-        <motion.div
-          className="md:hidden bg-bmki-purple shadow-xl"
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
-          exit={{ opacity: 0, height: 0 }}
-        >
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                onClick={() => setIsOpen(false)}
-                className="block px-3 py-2 text-base font-medium text-white hover:text-bmki-gold hover:bg-bmki-purple/80 rounded-md"
-              >
-                {link.name}
-              </Link>
-            ))}
-            <Link
-              href="/talent-portal"
-              onClick={() => setIsOpen(false)}
-              className="block w-full text-center mt-4 bg-bmki-gold text-bmki-purple px-6 py-2 rounded-full font-bold hover:bg-white transition-colors"
-            >
-              Talent Portal
-            </Link>
-          </div>
-        </motion.div>
-      )}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            key="mobile-menu"
+            className="md:hidden bg-bmki-purple shadow-xl overflow-hidden"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.25, ease: "easeInOut" }}
+          >
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  onClick={() => setIsOpen(false)}
+                  className={`block px-3 py-2 text-base font-medium text-white hover:text-bmki-gold hover:bg-bmki-purple/80 rounded-md ${
+                    pathname === link.href ? "text-bmki-gold bg-bmki-purple/80" : ""
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              ))}
+              {user ? (
+                <Link
+                  href="/talent-portal/dashboard"
+                  onClick={() => setIsOpen(false)}
+                  className="block w-full text-center mt-4 bg-bmki-gold text-bmki-purple px-6 py-2 rounded-full font-bold hover:bg-white transition-colors"
+                >
+                  My Portal
+                </Link>
+              ) : (
+                <Link
+                  href="/talent-portal"
+                  onClick={() => setIsOpen(false)}
+                  className="block w-full text-center mt-4 bg-bmki-gold text-bmki-purple px-6 py-2 rounded-full font-bold hover:bg-white transition-colors"
+                >
+                  Talent Portal
+                </Link>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.header>
   );
 }

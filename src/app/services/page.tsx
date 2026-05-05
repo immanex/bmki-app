@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Headphones, Camera, Sparkles, UserCheck, Video, Presentation } from "lucide-react";
+import Link from "next/link";
 
 const servicesList = [
   {
@@ -88,9 +89,9 @@ export default function ServicesPage() {
         <p className="text-gray-200 mb-8 max-w-2xl mx-auto">
           Partner with us to bring your creative vision to life. From brand activations to custom talent sourcing, we have you covered.
         </p>
-        <button className="px-8 py-4 bg-bmki-gold text-bmki-purple font-bold rounded-full hover:bg-white hover:scale-105 transition-all shadow-lg hover:shadow-bmki-gold/50">
+        <Link href="/contact" className="px-8 py-4 bg-bmki-gold text-bmki-purple font-bold rounded-full hover:bg-white hover:scale-105 transition-all shadow-lg inline-block">
           Contact Us Today
-        </button>
+        </Link>
       </section>
     </div>
   );

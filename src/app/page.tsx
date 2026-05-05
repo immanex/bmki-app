@@ -1,42 +1,9 @@
-"use client";
-
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight, Calendar, Star, Users } from "lucide-react";
-import { useState, useEffect } from "react";
+import CountdownTimer from "@/components/home/CountdownTimer";
 
 export default function Home() {
-  const [timeLeft, setTimeLeft] = useState({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-  });
-
-  useEffect(() => {
-    // Season 6 Target Date - Example: Dec 31, 2026
-    const targetDate = new Date("2026-12-31T20:00:00").getTime();
-
-    const interval = setInterval(() => {
-      const now = new Date().getTime();
-      const distance = targetDate - now;
-
-      if (distance < 0) {
-        clearInterval(interval);
-        return;
-      }
-
-      setTimeLeft({
-        days: Math.floor(distance / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-        minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
-        seconds: Math.floor((distance % (1000 * 60)) / 1000),
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
   return (
     <>
       {/* Hero Section */}
@@ -89,21 +56,7 @@ export default function Home() {
             <p className="text-bmki-gold text-xl">The biggest creative showcase in ABU Zaria</p>
           </div>
           
-          <div className="flex flex-wrap justify-center gap-4 md:gap-8">
-            {[
-              { label: "Days", value: timeLeft.days },
-              { label: "Hours", value: timeLeft.hours },
-              { label: "Minutes", value: timeLeft.minutes },
-              { label: "Seconds", value: timeLeft.seconds },
-            ].map((item, idx) => (
-              <div key={idx} className="flex flex-col items-center">
-                <div className="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center bg-neutral-900/50 backdrop-blur-md rounded-2xl border border-white/10 mb-3 shadow-xl">
-                  <span className="text-4xl md:text-6xl font-bold text-bmki-gold">{item.value.toString().padStart(2, '0')}</span>
-                </div>
-                <span className="text-white/80 font-medium uppercase tracking-wider">{item.label}</span>
-              </div>
-            ))}
-          </div>
+          <CountdownTimer />
         </div>
       </section>
 

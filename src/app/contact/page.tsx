@@ -2,8 +2,42 @@
 
 import { motion } from "framer-motion";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { db } from "@/lib/firebase";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+
+const contactSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  email: z.string().email("Invalid email address"),
+  message: z.string().min(10, "Message must be at least 10 characters"),
+});
+type ContactFormValues = z.infer<typeof contactSchema>;
 
 export default function ContactPage() {
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<ContactFormValues>({
+    resolver: zodResolver(contactSchema),
+  });
+
+  const onSubmit = async (data: ContactFormValues) => {
+    setStatus("loading");
+    try {
+      await addDoc(collection(db, "contact_messages"), {
+        ...data,
+        createdAt: serverTimestamp(),
+      });
+      setStatus("success");
+      reset();
+    } catch {
+      setStatus("error");
+    }
+  };
+
   return (
     <div className="pt-20 bg-neutral-50 dark:bg-neutral-950 min-h-screen">
       <section className="py-20 text-center px-4">
@@ -82,30 +116,45 @@ export default function ContactPage() {
           <div className="bg-white dark:bg-neutral-900 p-8 md:p-12 rounded-3xl shadow-lg border border-gray-100 dark:border-neutral-800">
             <h3 className="text-2xl font-bold mb-8 dark:text-white">Send us a Message</h3>
             
-            <form className="space-y-6">
+            <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">First Name</label>
-                  <input type="text" className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-neutral-700 bg-transparent focus:ring-2 focus:ring-bmki-purple focus:border-bmki-purple dark:text-white outline-none transition-all" placeholder="John" />
+                  <input {...register("firstName")} type="text" className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-neutral-700 bg-transparent focus:ring-2 focus:ring-bmki-purple focus:border-bmki-purple dark:text-white outline-none transition-all" placeholder="John" />
+                  {errors.firstName && <p className="mt-1 text-sm text-red-500">{errors.firstName.message}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Last Name</label>
-                  <input type="text" className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-neutral-700 bg-transparent focus:ring-2 focus:ring-bmki-purple focus:border-bmki-purple dark:text-white outline-none transition-all" placeholder="Doe" />
+                  <input {...register("lastName")} type="text" className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-neutral-700 bg-transparent focus:ring-2 focus:ring-bmki-purple focus:border-bmki-purple dark:text-white outline-none transition-all" placeholder="Doe" />
+                  {errors.lastName && <p className="mt-1 text-sm text-red-500">{errors.lastName.message}</p>}
                 </div>
               </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email Address</label>
-                <input type="email" className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-neutral-700 bg-transparent focus:ring-2 focus:ring-bmki-purple focus:border-bmki-purple dark:text-white outline-none transition-all" placeholder="john@example.com" />
+                <input {...register("email")} type="email" className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-neutral-700 bg-transparent focus:ring-2 focus:ring-bmki-purple focus:border-bmki-purple dark:text-white outline-none transition-all" placeholder="john@example.com" />
+                {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>}
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Message</label>
-                <textarea rows={5} className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-neutral-700 bg-transparent focus:ring-2 focus:ring-bmki-purple focus:border-bmki-purple dark:text-white outline-none transition-all resize-none" placeholder="How can we help you?"></textarea>
+                <textarea {...register("message")} rows={5} className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-neutral-700 bg-transparent focus:ring-2 focus:ring-bmki-purple focus:border-bmki-purple dark:text-white outline-none transition-all resize-none" placeholder="How can we help you?"></textarea>
+                {errors.message && <p className="mt-1 text-sm text-red-500">{errors.message.message}</p>}
               </div>
 
-              <button type="button" className="w-full py-4 bg-bmki-purple text-white font-bold rounded-xl hover:bg-bmki-purple/90 transition-colors shadow-lg">
-                Send Message
+              {status === "success" && (
+                <div className="p-3 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-lg text-sm text-center">
+                  Message sent! We'll get back to you soon.
+                </div>
+              )}
+              {status === "error" && (
+                <div className="p-3 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg text-sm text-center">
+                  Failed to send message. Please try again.
+                </div>
+              )}
+
+              <button type="submit" disabled={status === "loading"} className="w-full py-4 bg-bmki-purple text-white font-bold rounded-xl hover:bg-bmki-purple/90 transition-colors shadow-lg disabled:opacity-50">
+                {status === "loading" ? "Sending..." : "Send Message"}
               </button>
             </form>
           </div>

@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import { CalendarDays, MapPin, Clock, Ticket } from "lucide-react";
-import Image from "next/image";
 
 export default function EventsPage() {
   return (
@@ -91,12 +90,17 @@ export default function EventsPage() {
               <div className="flex flex-col sm:flex-row items-center gap-4 border-t border-gray-100 dark:border-neutral-800 pt-8">
                 <div className="flex-1 w-full">
                   <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Ticket Price</p>
-                  <p className="text-3xl font-bold dark:text-white">₦1,000</p>
+                  <p className="text-3xl font-bold dark:text-white">{'₦1,000'}</p>
                 </div>
-                <button className="w-full sm:w-auto px-8 py-4 bg-bmki-purple text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-bmki-gold hover:text-bmki-purple transition-colors shadow-lg hover:shadow-bmki-gold/50">
+                <a
+                  href="https://wa.me/2348000000000?text=I want to buy a BMKI Season 6 ticket"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full sm:w-auto px-8 py-4 bg-bmki-purple text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-bmki-gold hover:text-bmki-purple transition-colors shadow-lg"
+                >
                   <Ticket size={20} />
                   Buy Ticket Now
-                </button>
+                </a>
               </div>
             </div>
           </div>
