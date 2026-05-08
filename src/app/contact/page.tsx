@@ -40,16 +40,16 @@ export default function ContactPage() {
 
   return (
     <div className="pt-20 bg-neutral-50 dark:bg-neutral-950 min-h-screen">
-      <section className="py-20 text-center px-4">
+      <section className="py-12 sm:py-16 text-center px-4">
         <motion.h1 
-          className="text-4xl md:text-6xl font-extrabold text-neutral-900 dark:text-white mb-6"
+          className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-neutral-900 dark:text-white mb-6"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
           Get in <span className="text-bmki-purple dark:text-bmki-gold">Touch</span>
         </motion.h1>
         <motion.p 
-          className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto"
+          className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
@@ -58,17 +58,17 @@ export default function ContactPage() {
         </motion.p>
       </section>
 
-      <section className="pb-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+      <section className="pb-12 sm:pb-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12">
           {/* Contact Info & Map */}
           <div>
-            <div className="bg-white dark:bg-neutral-900 p-8 rounded-3xl shadow-lg border border-gray-100 dark:border-neutral-800 mb-8">
-              <h3 className="text-2xl font-bold mb-6 dark:text-white">Contact Information</h3>
+            <div className="bg-white dark:bg-neutral-900 p-6 sm:p-8 rounded-3xl shadow-lg border border-gray-100 dark:border-neutral-800 mb-6 sm:mb-8">
+              <h3 className="text-xl sm:text-2xl font-bold mb-6 dark:text-white">Contact Information</h3>
               
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 bg-bmki-purple/10 text-bmki-purple dark:bg-bmki-gold/10 dark:text-bmki-gold rounded-full flex items-center justify-center shrink-0">
-                    <MapPin size={24} />
+                    <MapPin size={20} />
                   </div>
                   <div>
                     <h4 className="font-semibold text-lg dark:text-white">Location</h4>
@@ -78,17 +78,17 @@ export default function ContactPage() {
 
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 bg-bmki-purple/10 text-bmki-purple dark:bg-bmki-gold/10 dark:text-bmki-gold rounded-full flex items-center justify-center shrink-0">
-                    <Phone size={24} />
+                    <Phone size={20} />
                   </div>
                   <div>
                     <h4 className="font-semibold text-lg dark:text-white">Phone</h4>
-                    <p className="text-gray-600 dark:text-gray-400">+234 (0) 800 000 0000</p>
+                    <a href="https://wa.me/2349058718400" target="_blank" rel="noopener noreferrer" className="text-bmki-purple dark:text-bmki-gold hover:underline">+234 905 871 8400</a>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 bg-bmki-purple/10 text-bmki-purple dark:bg-bmki-gold/10 dark:text-bmki-gold rounded-full flex items-center justify-center shrink-0">
-                    <Mail size={24} />
+                    <Mail size={20} />
                   </div>
                   <div>
                     <h4 className="font-semibold text-lg dark:text-white">Email</h4>
@@ -113,8 +113,8 @@ export default function ContactPage() {
           </div>
 
           {/* Contact Form */}
-          <div className="bg-white dark:bg-neutral-900 p-8 md:p-12 rounded-3xl shadow-lg border border-gray-100 dark:border-neutral-800">
-            <h3 className="text-2xl font-bold mb-8 dark:text-white">Send us a Message</h3>
+          <div className="bg-white dark:bg-neutral-900 p-6 sm:p-8 md:p-12 rounded-3xl shadow-lg border border-gray-100 dark:border-neutral-800">
+            <h3 className="text-xl sm:text-2xl font-bold mb-8 dark:text-white">Send us a Message</h3>
             
             <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
