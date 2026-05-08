@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Instagram, Twitter, Facebook, Youtube } from "lucide-react";
+import { Instagram as InstagramIcon, Twitter, Facebook, Youtube } from "lucide-react";
 import { useState } from "react";
 import { db } from "@/lib/firebase";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
@@ -40,7 +40,7 @@ export default function Footer() {
             </p>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-400 hover:text-bmki-gold transition-colors">
-                <Instagram size={20} />
+                <InstagramIcon size={20} />
               </a>
               <a href="#" className="text-gray-400 hover:text-bmki-gold transition-colors">
                 <Twitter size={20} />
